@@ -81,10 +81,6 @@ public class TemplateParseUtil {
     */
    public static final String VALID_VAR_CHARS = "[A-Za-z0-9\\\\(\\\\)\\+\\*\\.\\-_=,:;!~@% ]";
    /**
-    * Defines the valid chars for a parser input (e.g. entity reference)
-    */
-   public static final String VALID_INPUT_CHARS = "[A-Za-z0-9\\\\(\\\\)\\+\\*\\.\\-_=,:;!~@% "+SEPARATOR+"]";
-   /**
     * Defines the valid chars for a template
     */
    public static final String VALID_TEMPLATE_CHARS = "[A-Za-z0-9\\\\(\\\\)\\+\\*\\.\\-_=,:;&!~@%"+SEPARATOR+"\\{\\}]";
@@ -369,9 +365,6 @@ public class TemplateParseUtil {
       if (input == null || "".equals(input)) {
          throw new IllegalArgumentException("input cannot be null or empty");
       }
-      if (! input.matches(VALID_INPUT_CHARS+"+")) {
-         throw new IllegalArgumentException("input must consist of the following chars only (not counting []): " + VALID_INPUT_CHARS);         
-      }
       ProcessedTemplate analysis = null;
       Map<String, String> segments = new HashMap<String, String>();
       // strip off the extension if there is one
@@ -381,7 +374,7 @@ public class TemplateParseUtil {
       // try to get matches
       for (PreProcessedTemplate ppt : preprocessed) {
          segments.clear();
-         String regex = ppt.regex + "(?:/"+VALID_INPUT_CHARS+"+|$)"; // match extras if there are any (greedy match)
+         String regex = ppt.regex + "(?:/.+|$)"; // match extras if there are any (greedy match)
          Pattern p = Pattern.compile(regex);
          Matcher m = p.matcher(input);
          if ( m.matches() ) {
