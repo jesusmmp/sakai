@@ -72,10 +72,10 @@ $.fn.fileTree = function(options) {
     $(".jqueryFileTree.start").remove();
 
     $.ajax({
-      url: settings.ajaxUrl(dir),
+      url: settings.ajaxUrl(decodeURI(dir)),
       dataType: settings.ajaxDataType,
       type: settings.ajaxType,
-      data: settings.ajaxData(dir),
+      data: settings.ajaxData(decodeURI(dir)),
       cache:false,
       success: function(json) {
         var data = settings.formatResults(json);

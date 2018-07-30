@@ -26,5 +26,5 @@ $(function() {
 });
 function updatePathInput(data){
 	$('#active-folder').val(decodeURIComponent(data));
-	$('#folder-path').val(data);
+	$('#folder-path').val(decodeURIComponent(data));
 }
