@@ -484,14 +484,9 @@ public class TemplateParseUtilTest extends TestCase {
       result = TemplateParseUtil.parseTemplate(input, preprocessedTemplates);
       assertNull(result);
 
-      // invalid input is not acceptable
       input = "/myPrefix/stuff/specchars=&%$?{}";
-      try {
-         result = TemplateParseUtil.parseTemplate(input, preprocessedTemplates);
-         fail("Should have thrown exception");
-      } catch (IllegalArgumentException e) {
-         assertNotNull(e.getMessage());
-      }
+      result = TemplateParseUtil.parseTemplate(input, preprocessedTemplates);
+      assertNotNull(result);
 
    }
 

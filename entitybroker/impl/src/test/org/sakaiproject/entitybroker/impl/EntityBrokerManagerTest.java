@@ -161,13 +161,8 @@ public class EntityBrokerManagerTest {
       Assert.assertEquals(TestData.PREFIX1, view.getEntityReference().getPrefix());
       Assert.assertEquals(TestData.IDS1[0], view.getEntityReference().getId());
 
-      // also test some other URLs
-      try {
-        view = entityBrokerManager.parseEntityURL("/"+TestData.PREFIX1+"/az.xml?fname=Aaron&lname=Zeckoski");
-        Assert.fail("Should have thrown exception");
-    } catch (IllegalArgumentException e) {
-        Assert.assertNotNull(e.getMessage());
-    }
+      view = entityBrokerManager.parseEntityURL("/"+TestData.PREFIX1+"/az.xml?fname=Aaron&lname=Zeckoski");
+      Assert.assertNotNull(view);
 
       // parsing of URL related to unregistered entity references returns null
       view = entityBrokerManager.parseEntityURL(TestData.REF9);
