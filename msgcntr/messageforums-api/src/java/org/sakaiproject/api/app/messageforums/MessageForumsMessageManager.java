@@ -37,9 +37,9 @@ public interface MessageForumsMessageManager {
 
     public Message createOpenMessage();
 
-    public void saveMessage(Message message);
+    void saveOrUpdateMessage(Message message);
 
-    public void saveMessage(Message message, boolean logEvent);
+    void saveOrUpdateMessage(Message message, boolean logEvent);
     /**
      * 
      * @param message message
@@ -49,7 +49,7 @@ public interface MessageForumsMessageManager {
      * @param contextId context id
      *
      */
-	public void saveMessage(Message message, boolean logEvent, String toolId, String userId, String contextId);
+	void saveOrUpdateMessage(Message message, boolean logEvent, String toolId, String userId, String contextId);
 	
     /**
      * 
@@ -59,7 +59,34 @@ public interface MessageForumsMessageManager {
      * to be updated even if the topic or forum is locked (ie marking as read or
      * commenting on a moderated message)
      */
-    public void saveMessage(Message message, boolean logEvent, boolean ignoreLockedTopicForum);
+    void saveOrUpdateMessage(Message message, boolean logEvent, boolean ignoreLockedTopicForum);
+    
+    String saveMessage(Message message);
+
+    String saveMessage(Message message, boolean logEvent);
+    /**
+     * 
+     * @param message message
+     * @param logEvent logEvent
+     * @param toolId id of the forums tool 
+     * @param userId user id
+     * @param contextId context id
+     *
+     */
+    String saveMessage(Message message, boolean logEvent, String toolId, String userId, String contextId);
+	
+    /**
+     * 
+     * @param message
+     * @param logEvent
+     * @param ignoreLockedTopicForum set true if you want to allow the message
+     * to be updated even if the topic or forum is locked (ie marking as read or
+     * commenting on a moderated message)
+     */
+	String saveMessage(Message message, boolean logEvent, boolean ignoreLockedTopicForum);
+
+    String saveMessage(Message message, boolean logEvent, String toolId, String userId, String contextId,
+            boolean ignoreLockedTopicForum);
 
     public void deleteMessage(Message message);
 
