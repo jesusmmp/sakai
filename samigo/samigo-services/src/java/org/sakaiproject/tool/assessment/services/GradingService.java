@@ -3212,9 +3212,9 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
 
               // If replacement is a negative number, wrap in parentheses to avoid confused operations
               // For example, 3 {y} with -10 should be 3*-10= -30 not 3 -10 = -7
-              if (value.charAt(0) == '-' && Character.isDigit(value.charAt(1))) {
+              /*if (value.charAt(0) == '-' && Character.isDigit(value.charAt(1))) {
                   replacementValue = ParserSymbol.LEFT_PARENTHESES_STR + value + ParserSymbol.RIGHT_PARENTHESES_STR;
-              }
+              }*/
 
               // if last character of prefix is a number or the edge of parenthesis, multiply by the variable
               // if x = 37, 5{x} -> 5*37
