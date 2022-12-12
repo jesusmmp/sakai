@@ -3069,13 +3069,20 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
               answerList.putAll(evaluatedFormulas);
               // replace the variables in the text with values
               String instructions = item.getInstruction();
+              String correctFeedback = item.getCorrectItemFeedback();
+              String incorrectFeedback = item.getInCorrectItemFeedback();
               instructions = replaceMappedVariablesWithNumbers(instructions, variablesWithValues);
+              correctFeedback = replaceMappedVariablesWithNumbers(correctFeedback, variablesWithValues);
+              incorrectFeedback = replaceMappedVariablesWithNumbers(incorrectFeedback, variablesWithValues);
               // then replace the calculations with values (must happen AFTER the variable replacement)
               try {
                   instructions = replaceCalculationsWithValues(instructions, 5); // what decimal precision should we use here?
+                  correctFeedback = replaceCalculationsWithValues(correctFeedback, 5);
+                  incorrectFeedback = replaceCalculationsWithValues(incorrectFeedback, 5);
                   // if could not process the calculation into a result then throws IllegalStateException which will be caught below and cause the numbers to regenerate
                   // only pull out the segments if the formulas worked
                   instructionSegments = extractInstructionSegments(instructions);
+                  item.setInCorrectItemFeedback(incorrectFeedback);
                   hasErrors = false;
               } catch (SamigoExpressionError e1) {
                   log.warn("Samigo calculated item ({}) calculation invalid: {}", item.getItemId(), e1.get());
