@@ -868,9 +868,9 @@ public class ItemFacade implements Serializable, ItemDataIfc, Comparable<ItemDat
    * Set General Feedback
    * @param text
    */
-  public void setGeneralItemFeedback(String text) {
+  public void setGeneralItemFeedback(String text, String value) {
     removeFeedbackByType(ItemFeedbackIfc.GENERAL_FEEDBACK);
-    addItemFeedback(ItemFeedbackIfc.GENERAL_FEEDBACK, text);
+    addItemFeedback(ItemFeedbackIfc.GENERAL_FEEDBACK, text, value);
   }
 
 
@@ -882,13 +882,17 @@ public class ItemFacade implements Serializable, ItemDataIfc, Comparable<ItemDat
     return getItemFeedback(ItemFeedbackIfc.CORRECT_FEEDBACK);
   }
 
+  public String getCorrectItemFeedbackValue() {
+    return getItemFeedback(ItemFeedbackIfc.CORRECT_FEEDBACK);
+  }
+
   /**
    * Set Correct Feedback
    * @param text
    */
-  public void setCorrectItemFeedback(String text) {
+  public void setCorrectItemFeedback(String text, String value) {
     removeFeedbackByType(ItemFeedbackIfc.CORRECT_FEEDBACK);
-    addItemFeedback(ItemFeedbackIfc.CORRECT_FEEDBACK, text);
+    addItemFeedback(ItemFeedbackIfc.CORRECT_FEEDBACK, text, value);
   }
 
   /**
@@ -900,12 +904,20 @@ public class ItemFacade implements Serializable, ItemDataIfc, Comparable<ItemDat
   }
 
   /**
+   * Get Incorrect Feedback Value
+   * @return
+   */
+  public String getInCorrectItemFeedbackValue() {
+    return getItemFeedbackValue(ItemFeedbackIfc.INCORRECT_FEEDBACK);
+  }
+
+  /**
    * Set InCorrect Feedback
    * @param text
    */
-  public void setInCorrectItemFeedback(String text) {
+  public void setInCorrectItemFeedback(String text, String value) {
     removeFeedbackByType(ItemFeedbackIfc.INCORRECT_FEEDBACK);
-    addItemFeedback(ItemFeedbackIfc.INCORRECT_FEEDBACK, text);
+    addItemFeedback(ItemFeedbackIfc.INCORRECT_FEEDBACK, text, value);
   }
 
   /**
@@ -924,16 +936,31 @@ public class ItemFacade implements Serializable, ItemDataIfc, Comparable<ItemDat
   }
 
   /**
+   * Get feedback based on feedback type (e.g. CORRECT, INCORRECT)
+   * @param feedbackTypeId
+   * @return
+   */
+  public String getItemFeedbackValue(String feedbackTypeId) {
+    for (Iterator i = this.itemFeedbackSet.iterator(); i.hasNext(); ) {
+      ItemFeedbackIfc itemFeedback = (ItemFeedbackIfc) i.next();
+      if (itemFeedback.getTypeId().equals(feedbackTypeId)) {
+        return itemFeedback.getTextValue();
+      }
+    }
+    return null;
+  }
+
+  /**
    * Add feedback of a specified feedback type (e.g. CORRECT, INCORRECT)
    * to ItemFacade
    * @param feedbackTypeId
    * @param text
    */
-  public void addItemFeedback(String feedbackTypeId, String text) {
+  public void addItemFeedback(String feedbackTypeId, String text, String value) {
     if (this.itemFeedbackSet == null) {
       setItemFeedbackSet(new HashSet());
     }
-    this.data.getItemFeedbackSet().add(new ItemFeedback((ItemData)this.data, feedbackTypeId, text));
+    this.data.getItemFeedbackSet().add(new ItemFeedback((ItemData)this.data, feedbackTypeId, text, value));
     this.itemFeedbackSet = this.data.getItemFeedbackSet();
   }
 

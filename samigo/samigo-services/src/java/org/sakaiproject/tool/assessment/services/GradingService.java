@@ -3077,12 +3077,15 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
               // then replace the calculations with values (must happen AFTER the variable replacement)
               try {
                   instructions = replaceCalculationsWithValues(instructions, 5); // what decimal precision should we use here?
-                  correctFeedback = replaceCalculationsWithValues(correctFeedback, 5);
-                  incorrectFeedback = replaceCalculationsWithValues(incorrectFeedback, 5);
+                  String correctFeedbackValue = replaceCalculationsWithValues(correctFeedback, 5);
+                  String incorrectFeedbackValue = replaceCalculationsWithValues(incorrectFeedback, 5);
                   // if could not process the calculation into a result then throws IllegalStateException which will be caught below and cause the numbers to regenerate
                   // only pull out the segments if the formulas worked
                   instructionSegments = extractInstructionSegments(instructions);
-                  item.setInCorrectItemFeedback(incorrectFeedback);
+                  item.setCorrectItemFeedback(correctFeedback, correctFeedbackValue);
+                  item.setInCorrectItemFeedback(incorrectFeedback, incorrectFeedbackValue);
+                  //item.setCorrectItemFeedbackValue(correctFeedback);
+                  //item.setIncorrectItemFeedbackValue(incorrectFeedback);
                   hasErrors = false;
               } catch (SamigoExpressionError e1) {
                   log.warn("Samigo calculated item ({}) calculation invalid: {}", item.getItemId(), e1.get());
@@ -3196,8 +3199,8 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
    * the original answerExpression 
    */
   public String replaceMappedVariablesWithNumbers(String expression, Map<String, String> variables) {
-      if (expression == null) {
-          expression = "";
+      if (StringUtils.isEmpty(expression)) {
+          return expression;
       }
       
       if (variables == null) {

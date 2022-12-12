@@ -451,19 +451,27 @@ public ItemData() {}
   public String getCorrectItemFeedback() {
     return getItemFeedback(ItemFeedback.CORRECT_FEEDBACK);
   }
+  
+  public String getCorrectItemFeedbackValue() {
+    return getItemFeedbackValue(ItemFeedback.CORRECT_FEEDBACK);
+  }
 
-  public void setCorrectItemFeedback(String text) {
+  public void setCorrectItemFeedback(String text, String value) {
     removeFeedbackByType(ItemFeedback.CORRECT_FEEDBACK);
-    addItemFeedback(ItemFeedback.CORRECT_FEEDBACK, text);
+    addItemFeedback(ItemFeedback.CORRECT_FEEDBACK, text, value);
   }
 
   public String getInCorrectItemFeedback() {
     return getItemFeedback(ItemFeedback.INCORRECT_FEEDBACK);
   }
+  
+  public String getInCorrectItemFeedbackValue() {
+    return getItemFeedbackValue(ItemFeedback.INCORRECT_FEEDBACK);
+  }
 
-  public void setInCorrectItemFeedback(String text) {
+  public void setInCorrectItemFeedback(String text, String value) {
     removeFeedbackByType(ItemFeedback.INCORRECT_FEEDBACK);
-    addItemFeedback(ItemFeedback.INCORRECT_FEEDBACK, text);
+    addItemFeedback(ItemFeedback.INCORRECT_FEEDBACK, text, value);
   }
 
  /**
@@ -478,9 +486,9 @@ public ItemData() {}
    * Set General Feedback
    * @param text
    */
-  public void setGeneralItemFeedback(String text) {
+  public void setGeneralItemFeedback(String text, String value) {
     removeFeedbackByType(ItemFeedback.GENERAL_FEEDBACK);
-    addItemFeedback(ItemFeedback.GENERAL_FEEDBACK, text);
+    addItemFeedback(ItemFeedback.GENERAL_FEEDBACK, text, "");
   }
 
   public String getItemFeedback(String typeId) {
@@ -495,12 +503,25 @@ public ItemData() {}
 	  }
 	  return null;
   }
+  
+  public String getItemFeedbackValue(String typeId) {
+	  if ( this.itemFeedbackSet == null || this.itemFeedbackSet.isEmpty() ) {
+		  return null;
+	  }
+	  for (Iterator<ItemFeedbackIfc> i = this.itemFeedbackSet.iterator(); i.hasNext(); ) {
+		  ItemFeedback itemFeedback = (ItemFeedback) i.next();
+		  if (itemFeedback.getTypeId().equals(typeId)) {
+			  return (String) itemFeedback.getTextValue();
+		  }
+	  }
+	  return null;
+  }
 
-  public void addItemFeedback(String typeId, String text) {
+  public void addItemFeedback(String typeId, String text, String value) {
     if (this.itemFeedbackSet == null) {
       setItemFeedbackSet(new HashSet<ItemFeedbackIfc>());
     }
-    this.itemFeedbackSet.add(new ItemFeedback(this, typeId, text));
+    this.itemFeedbackSet.add(new ItemFeedback(this, typeId, text, value));
   }
 
   public void removeFeedbackByType(String typeId) {

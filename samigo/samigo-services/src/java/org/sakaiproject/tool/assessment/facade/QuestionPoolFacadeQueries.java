@@ -1251,13 +1251,13 @@ public class QuestionPoolFacadeQueries
       item.setInstruction(AssessmentService.copyStringAttachment(itemData.getInstruction()));
 
       if (itemData.getCorrectItemFeedback() != null && !itemData.getCorrectItemFeedback().equals("")) {
-    	  item.setCorrectItemFeedback(AssessmentService.copyStringAttachment(itemData.getCorrectItemFeedback()));
+    	  item.setCorrectItemFeedback(AssessmentService.copyStringAttachment(itemData.getCorrectItemFeedback()), "");
       }
       if (itemData.getInCorrectItemFeedback() != null && !itemData.getInCorrectItemFeedback().equals("")) {
-    	  item.setInCorrectItemFeedback(AssessmentService.copyStringAttachment(itemData.getInCorrectItemFeedback()));
+    	  item.setInCorrectItemFeedback(AssessmentService.copyStringAttachment(itemData.getInCorrectItemFeedback()), "");
       }
       if (itemData.getGeneralItemFeedback() != null && !itemData.getGeneralItemFeedback().equals("")) {
-    	  item.setGeneralItemFeedback(AssessmentService.copyStringAttachment(itemData.getGeneralItemFeedback()));
+    	  item.setGeneralItemFeedback(AssessmentService.copyStringAttachment(itemData.getGeneralItemFeedback()), "");
       }
       
       return item;

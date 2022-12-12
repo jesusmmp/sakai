@@ -1261,10 +1261,12 @@ public class DeliveryActionListener
     	{
     		
     		itemBean.setFeedback(item.getCorrectItemFeedback());
+    		itemBean.setFeedbackValue(item.getCorrectItemFeedbackValue());
     	}
     	else
     	{
     		itemBean.setFeedback(item.getInCorrectItemFeedback());
+    		itemBean.setFeedbackValue(item.getInCorrectItemFeedbackValue());
     	}
     }
     else {

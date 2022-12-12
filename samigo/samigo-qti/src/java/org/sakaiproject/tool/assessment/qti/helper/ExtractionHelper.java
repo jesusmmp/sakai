@@ -1787,9 +1787,9 @@ public class ExtractionHelper
 
 	  }
 
-	  item.setGeneralItemFeedback(generalItemFeedback);
-	  item.setCorrectItemFeedback(correctItemFeedback);
-	  item.setInCorrectItemFeedback(incorrectItemFeedback);
+	  item.setGeneralItemFeedback(generalItemFeedback, generalItemFeedback);
+	  item.setCorrectItemFeedback(correctItemFeedback, correctItemFeedback);
+	  item.setInCorrectItemFeedback(incorrectItemFeedback, incorrectItemFeedback);
   }
 
   private void addFeedback(ItemFacade item, Map<String, String> map, Long typeId)
@@ -1815,15 +1815,15 @@ public class ExtractionHelper
 
 	  if (notNullOrEmpty(correctItemFeedback))
 	  {
-		  item.setCorrectItemFeedback(makeFCKAttachment(correctItemFeedback));
+		  item.setCorrectItemFeedback(makeFCKAttachment(correctItemFeedback), makeFCKAttachment(correctItemFeedback));
 	  }
 	  if (notNullOrEmpty(incorrectItemFeedback))
 	  {
-		  item.setInCorrectItemFeedback(makeFCKAttachment(incorrectItemFeedback));
+		  item.setInCorrectItemFeedback(makeFCKAttachment(incorrectItemFeedback), makeFCKAttachment(incorrectItemFeedback));
 	  }
 	  if (notNullOrEmpty(generalItemFeedback))
 	  {
-		  item.setGeneralItemFeedback(makeFCKAttachment(generalItemFeedback));
+		  item.setGeneralItemFeedback(makeFCKAttachment(generalItemFeedback), makeFCKAttachment(generalItemFeedback));
 	  }
   }
   
