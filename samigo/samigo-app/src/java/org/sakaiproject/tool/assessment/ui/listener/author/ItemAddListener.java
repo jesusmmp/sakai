@@ -831,14 +831,14 @@ public class ItemAddListener implements ActionListener {
           // if it's an empty string, we need to update feedback to an empty string
           // not like below (below we don't ADD if the feedback is null or empty string)
           if ((bean.getCorrFeedback() != null)) {
-            		updateItemFeedback(item, ItemFeedbackIfc.CORRECT_FEEDBACK, stripPtags(bean.getCorrFeedback()), stripPtags(bean.getCorrFeedback()));
-              }
-              if ((bean.getIncorrFeedback() != null)) {
-                	updateItemFeedback(item, ItemFeedbackIfc.INCORRECT_FEEDBACK, stripPtags(bean.getIncorrFeedback()), stripPtags(bean.getIncorrFeedback()));
-              }
-              if ((bean.getGeneralFeedback() != null)) {
-                	updateItemFeedback(item, ItemFeedbackIfc.GENERAL_FEEDBACK, stripPtags(bean.getGeneralFeedback()), stripPtags(bean.getGeneralFeedback()));
-           }
+                updateItemFeedback(item, ItemFeedbackIfc.CORRECT_FEEDBACK, stripPtags(bean.getCorrFeedback()), stripPtags(bean.getCorrFeedback()));
+          }
+          if ((bean.getIncorrFeedback() != null)) {
+               	updateItemFeedback(item, ItemFeedbackIfc.INCORRECT_FEEDBACK, stripPtags(bean.getIncorrFeedback()), stripPtags(bean.getIncorrFeedback()));
+          }
+          if ((bean.getGeneralFeedback() != null)) {
+               	updateItemFeedback(item, ItemFeedbackIfc.GENERAL_FEEDBACK, stripPtags(bean.getGeneralFeedback()), stripPtags(bean.getGeneralFeedback()));
+          }
       }
       else {
         	//prepare itemText, including answers
@@ -865,16 +865,13 @@ public class ItemAddListener implements ActionListener {
             item.setItemMetaDataSet(prepareMetaData(item, bean));
 
             // prepare feedback, only store if feedbacks are not empty
-            if ( (bean.getCorrFeedback() != null) &&
-      			  (!bean.getCorrFeedback().equals(""))) {
-            	item.setCorrectItemFeedback(stripPtags(bean.getCorrFeedback()), stripPtags(bean.getCorrFeedback()));
+      	  	if (!StringUtils.isEmpty(bean.getCorrFeedback())) {
+      	  		item.setCorrectItemFeedback(stripPtags(bean.getCorrFeedback()), stripPtags(bean.getCorrFeedback()));
       	  	}
-      	  	if ( (bean.getIncorrFeedback() != null) &&
-      			  (!bean.getIncorrFeedback().equals(""))) {
+      	  	if (!StringUtils.isEmpty(bean.getIncorrFeedback())) {
       	  		item.setInCorrectItemFeedback(stripPtags(bean.getIncorrFeedback()), stripPtags(bean.getIncorrFeedback()));
       	  	}
-      	  	if ( (bean.getGeneralFeedback() != null) &&
-      			  (!bean.getGeneralFeedback().equals(""))) {
+      	  	if (!StringUtils.isEmpty(bean.getGeneralFeedback())) {
       	  		item.setGeneralItemFeedback(stripPtags(bean.getGeneralFeedback()), stripPtags(bean.getGeneralFeedback()));
       	  	}
       }
@@ -2965,6 +2962,7 @@ public class ItemAddListener implements ActionListener {
 			  if (itemFeedback.getTypeId().equals(feedbackTypeId)) {
                   feedbackTypeExists = true;
 				  itemFeedback.setText(feedbackText);
+				  itemFeedback.setTextValue(feedbackTextValue);
 				  break;
 			  }
 		  }

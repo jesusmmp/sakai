@@ -3072,20 +3072,18 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
               String correctFeedback = item.getCorrectItemFeedback();
               String incorrectFeedback = item.getInCorrectItemFeedback();
               instructions = replaceMappedVariablesWithNumbers(instructions, variablesWithValues);
-              correctFeedback = replaceMappedVariablesWithNumbers(correctFeedback, variablesWithValues);
-              incorrectFeedback = replaceMappedVariablesWithNumbers(incorrectFeedback, variablesWithValues);
+              String correctFeedbackNumbers = replaceMappedVariablesWithNumbers(correctFeedback, variablesWithValues);
+              String incorrectFeedbackNumbers = replaceMappedVariablesWithNumbers(incorrectFeedback, variablesWithValues);
               // then replace the calculations with values (must happen AFTER the variable replacement)
               try {
                   instructions = replaceCalculationsWithValues(instructions, 5); // what decimal precision should we use here?
-                  String correctFeedbackValue = replaceCalculationsWithValues(correctFeedback, 5);
-                  String incorrectFeedbackValue = replaceCalculationsWithValues(incorrectFeedback, 5);
+                  String correctFeedbackValue = replaceCalculationsWithValues(correctFeedbackNumbers, 5);
+                  String incorrectFeedbackValue = replaceCalculationsWithValues(incorrectFeedbackNumbers, 5);
                   // if could not process the calculation into a result then throws IllegalStateException which will be caught below and cause the numbers to regenerate
                   // only pull out the segments if the formulas worked
                   instructionSegments = extractInstructionSegments(instructions);
                   item.setCorrectItemFeedback(correctFeedback, correctFeedbackValue);
                   item.setInCorrectItemFeedback(incorrectFeedback, incorrectFeedbackValue);
-                  //item.setCorrectItemFeedbackValue(correctFeedback);
-                  //item.setIncorrectItemFeedbackValue(incorrectFeedback);
                   hasErrors = false;
               } catch (SamigoExpressionError e1) {
                   log.warn("Samigo calculated item ({}) calculation invalid: {}", item.getItemId(), e1.get());

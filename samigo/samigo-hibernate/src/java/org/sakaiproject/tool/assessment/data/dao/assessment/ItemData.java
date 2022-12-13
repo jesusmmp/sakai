@@ -451,7 +451,7 @@ public ItemData() {}
   public String getCorrectItemFeedback() {
     return getItemFeedback(ItemFeedback.CORRECT_FEEDBACK);
   }
-  
+
   public String getCorrectItemFeedbackValue() {
     return getItemFeedbackValue(ItemFeedback.CORRECT_FEEDBACK);
   }
@@ -464,7 +464,7 @@ public ItemData() {}
   public String getInCorrectItemFeedback() {
     return getItemFeedback(ItemFeedback.INCORRECT_FEEDBACK);
   }
-  
+
   public String getInCorrectItemFeedbackValue() {
     return getItemFeedbackValue(ItemFeedback.INCORRECT_FEEDBACK);
   }
@@ -503,7 +503,7 @@ public ItemData() {}
 	  }
 	  return null;
   }
-  
+
   public String getItemFeedbackValue(String typeId) {
 	  if ( this.itemFeedbackSet == null || this.itemFeedbackSet.isEmpty() ) {
 		  return null;
