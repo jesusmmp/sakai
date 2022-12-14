@@ -40,7 +40,7 @@ public class PublishedItemFeedback
   private ItemDataIfc item;
   private String typeId;
   private String text;
-  private String textValue;
+  private String textValue; //Not saved on DB
 
   public PublishedItemFeedback() {}
 

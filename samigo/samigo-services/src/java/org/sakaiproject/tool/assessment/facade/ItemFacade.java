@@ -882,6 +882,10 @@ public class ItemFacade implements Serializable, ItemDataIfc, Comparable<ItemDat
     return getItemFeedback(ItemFeedbackIfc.CORRECT_FEEDBACK);
   }
 
+  /**
+   * Get Correct Feedback Value
+   * @return
+   */
   public String getCorrectItemFeedbackValue() {
     return getItemFeedback(ItemFeedbackIfc.CORRECT_FEEDBACK);
   }
@@ -889,6 +893,7 @@ public class ItemFacade implements Serializable, ItemDataIfc, Comparable<ItemDat
   /**
    * Set Correct Feedback
    * @param text
+   * @param value
    */
   public void setCorrectItemFeedback(String text, String value) {
     removeFeedbackByType(ItemFeedbackIfc.CORRECT_FEEDBACK);
@@ -914,6 +919,7 @@ public class ItemFacade implements Serializable, ItemDataIfc, Comparable<ItemDat
   /**
    * Set InCorrect Feedback
    * @param text
+   * @param value
    */
   public void setInCorrectItemFeedback(String text, String value) {
     removeFeedbackByType(ItemFeedbackIfc.INCORRECT_FEEDBACK);

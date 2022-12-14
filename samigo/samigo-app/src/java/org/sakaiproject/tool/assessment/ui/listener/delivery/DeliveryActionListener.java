@@ -1063,9 +1063,6 @@ public class DeliveryActionListener
       } else {
         itemBean.setSequence( ( (Integer) itemGradingHash.get("sequence" + thisItem.getItemId().toString())).toString());
       }
-      
-      //añadir
-      //itemBean.setFeedbackValue(itemBean.getitem);
 
       // scoring
       maxPoints += itemBean.getItemData().getIsExtraCredit() ? 0 : itemBean.getMaxPoints();
@@ -1262,14 +1259,17 @@ public class DeliveryActionListener
    	
     	if (itemBean.getExactPoints() >= itemBean.getMaxPoints())
     	{
-    		
     		itemBean.setFeedback(item.getCorrectItemFeedback());
-    		//itemBean.setFeedbackValue(item.getCorrectItemFeedbackValue());
+    		if (item.getTypeId().equals(TypeIfc.CALCULATED_QUESTION)) {
+    			itemBean.setFeedbackValue(item.getCorrectItemFeedbackValue());
+    		}
     	}
     	else
     	{
     		itemBean.setFeedback(item.getInCorrectItemFeedback());
-    		//itemBean.setFeedbackValue(item.getInCorrectItemFeedbackValue());
+    		if (item.getTypeId().equals(TypeIfc.CALCULATED_QUESTION)) {
+    			itemBean.setFeedbackValue(item.getInCorrectItemFeedbackValue());
+    		}
     	}
     }
     else {

@@ -86,7 +86,7 @@ public class ItemContentsBean implements Serializable {
 
 	private String feedback;
 
-	//private String feedbackValue;
+	private String feedbackValue;
 
 	private String responseId = "2";
 
@@ -656,19 +656,19 @@ public class ItemContentsBean implements Serializable {
 	 *
 	 * @return the item level feedback value
 	 */
-	/*public String getFeedbackValue() {
+	public String getFeedbackValue() {
 		return feedbackValue;
-	}*/
+	}
 
 	/**
 	 * item level feedback value
 	 *
-	 * @param feedback
+	 * @param feedbackValue
 	 *            the item level feedback value
 	 */
-	/*public void setFeedbackValue(String feedbackValue) {
+	public void setFeedbackValue(String feedbackValue) {
 		this.feedbackValue = feedbackValue;
-	}*/
+	}
 
 	/**
 	 * If this is a true-false question return true if it is true, else false.

@@ -38,7 +38,7 @@ public class ItemFeedback
   private ItemDataIfc item;
   private String typeId;
   private String text;
-  private String textValue;
+  private String textValue; //Not saved on DB
 
   public ItemFeedback() {}
 
