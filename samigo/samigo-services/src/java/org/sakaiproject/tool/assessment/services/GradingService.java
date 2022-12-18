@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +48,7 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.time.Instant;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -145,6 +147,8 @@ public class GradingService
   // SAK-40942 - Error in calculated questions: the decimal representation .n or n. (where n is a number) does not work
   public static final Pattern CALCQ_FORMULA_ALLOW_POINT_NUMBER = Pattern.compile("([^\\d]|^)([\\.])([\\d])");
   public static final Pattern CALCQ_FORMULA_ALLOW_NUMBER_POINT = Pattern.compile("([\\d])([\\.])([^\\d]|$)");
+  public static final Pattern CALCQ_DOUBLE_OPEN_BRACKET = Pattern.compile(OPEN_BRACKET + OPEN_BRACKET);
+  public static final Pattern CALCQ_DOUBLE_CLOSE_BRACKET = Pattern.compile(CLOSE_BRACKET  + CLOSE_BRACKET );
   
   private static final int WRONG_IMAGE_MAP_ANSWER_NON_PARCIAL = -123456789;
   
@@ -153,7 +157,7 @@ public class GradingService
   @Getter @Setter
   private List<String> texts;
   @Getter @Setter
-  private HashMap<Integer, String> answersMap = new HashMap<Integer, String>();
+  private LinkedHashMap<String, String> answersMap = new LinkedHashMap<String, String>();
   private static final int MAX_ERROR_TRIES = 100;
 	  
   /**
@@ -712,7 +716,7 @@ public class GradingService
   public void saveOrUpdateAssessmentGradingOnly(AssessmentGradingData assessment)
   {
 	  Set origItemGradingSet = assessment.getItemGradingSet();
-	  HashSet h = new HashSet(origItemGradingSet);
+	  LinkedHashSet h = new LinkedHashSet(origItemGradingSet);
 	  
 	  // Clear the itemGradingSet so no data gets inserted/updated in SAM_ITEMGRADING_T;
 	  origItemGradingSet.clear();
@@ -898,7 +902,7 @@ public class GradingService
       List<ItemGradingData> tempItemGradinglist = new ArrayList<>(itemGradingSet);
       
       // CALCULATED_QUESTION - if this is a calc question. Carefully sort the list of answers
-      if (isCalcQuestion(tempItemGradinglist, publishedItemHash)) {
+      /*if (isCalcQuestion(tempItemGradinglist, publishedItemHash)) {
 	      Collections.sort(tempItemGradinglist, new Comparator<ItemGradingData>(){
 	    	  public int compare(ItemGradingData o1, ItemGradingData o2) {
 	    		  ItemGradingData gradeData1 = o1;
@@ -912,7 +916,7 @@ public class GradingService
 	    		  return gradeData1.getPublishedAnswerId().compareTo(gradeData2.getPublishedAnswerId());
 	    	  }
 	      });
-      }
+      }*/
       
     //IMAGEMAP_QUESTION - order by itemGradingId if it is an imageMap question
       if (isImageMapQuestion(tempItemGradinglist, publishedItemHash)) {
@@ -1279,7 +1283,7 @@ public class GradingService
     // Because if itemGradingSet is not saved to DB, we cannot go to DB to get it. We have to 
     // get it through data.
     if (persistToDB) {
-        data.setItemGradingSet(new HashSet());
+        data.setItemGradingSet(new LinkedHashSet());
     	saveOrUpdateAssessmentGrading(data);
     	log.debug("****x7. {}", (new Date()).getTime());	
     	if (!regrade) {
@@ -1469,9 +1473,10 @@ public class GradingService
       case 11: // FIN
     	  try {
     	      if (type == 15) {  // CALCULATED_QUESTION
-	              Map<Integer, String> calculatedAnswersMap = getCalculatedAnswersMap(itemGrading, item, calcQuestionAnswerSequence);
+	              Map<String, String> calculatedAnswersMap = getCalculatedAnswersMap(itemGrading, item, calcQuestionAnswerSequence);
 	              int numAnswers = calculatedAnswersMap.size();
-	              autoScore = getCalcQScore(itemGrading, item, calculatedAnswersMap, calcQuestionAnswerSequence ) / (double) numAnswers;
+
+	              autoScore = getCalcQScore(itemGrading, item, calculatedAnswersMap, (calculatedAnswersMap.keySet().toArray())[ calcQuestionAnswerSequence - 1 ].toString() ) / (double) numAnswers;
 	          } else {
 	              autoScore = getFINScore(itemGrading, item, publishedAnswerHash) / (double) ((ItemTextIfc) item.getItemTextSet().toArray()[0]).getAnswerSet().size();
 	          }
@@ -2271,17 +2276,17 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
    * @param calcQuestionAnswerSequence the order of answers in the list
    * @return score for the item.
    */
-  public double getCalcQScore(ItemGradingData data,  ItemDataIfc itemdata, Map<Integer, String> calculatedAnswersMap, int calcQuestionAnswerSequence)
+  public double getCalcQScore(ItemGradingData data,  ItemDataIfc itemdata, Map<String, String> calculatedAnswersMap, String label)
   {
 	  double totalScore = (double) 0;
 	  
 	  if (data.getAnswerText() == null) return totalScore; // zero for blank
 	  
-	  if (!calculatedAnswersMap.containsKey(calcQuestionAnswerSequence)) {
+	  if (!calculatedAnswersMap.containsKey(label)) {
 		  return totalScore;
 	  }
 	  // this variable should look something like this "42.1|2,2"
-	  String allAnswerText = calculatedAnswersMap.get(calcQuestionAnswerSequence);
+	  String allAnswerText = calculatedAnswersMap.get(label);
 	  
 	  // NOTE: this correctAnswer will already have been trimmed to the appropriate number of decimals
 	  BigDecimal correctAnswer = new BigDecimal(getAnswerExpression(allAnswerText));
@@ -2315,17 +2320,17 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
 	  
   }
 
-  public boolean getCalcQResult(ItemGradingData data,  ItemDataIfc itemdata, Map<Integer, String> calculatedAnswersMap, int calcQuestionAnswerSequence)
+  public boolean getCalcQResult(ItemGradingData data,  ItemDataIfc itemdata, Map<String, String> calculatedAnswersMap, String label)
   {
 	  boolean result = false;
 
 	  if (data.getAnswerText() == null) return result;
 
-	  if (!calculatedAnswersMap.containsKey(calcQuestionAnswerSequence)) {
+	  if (!calculatedAnswersMap.containsKey(label)) {
 		  return result;
 	  }
 	  // this variable should look something like this "42.1|2,2"
-	  String allAnswerText = calculatedAnswersMap.get(calcQuestionAnswerSequence);
+	  String allAnswerText = calculatedAnswersMap.get(label);
 
 	  // NOTE: this correctAnswer will already have been trimmed to the appropriate number of decimals
 	  BigDecimal correctAnswer = new BigDecimal(getAnswerExpression(allAnswerText));
@@ -2776,13 +2781,38 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
    * @param item
    * @return map of calc answers
    */
-  private Map<Integer, String> getCalculatedAnswersMap(ItemGradingData itemGrading, ItemDataIfc item, int calcQuestionAnswerSequence ) {
+  private LinkedHashMap<String, String> getCalculatedAnswersMap(ItemGradingData itemGrading, ItemDataIfc item, int calcQuestionAnswerSequence ) {
       // return value from extractCalcQAnswersArray is not used, calculatedAnswersMap is populated by this call
       if (calcQuestionAnswerSequence == 1) {
-          extractCalcQAnswersArray(answersMap, item, itemGrading.getAssessmentGradingId(), itemGrading.getAgentId());
+          List<List<String>> texts = extractCalcQAnswersArray(answersMap, item, itemGrading.getAssessmentGradingId(), itemGrading.getAgentId());
+
+          //changing solutions ex: {{w}} with numbers
+          //replaceSolutionOnFeedbackWithNumbers(answersMap, item, texts);
       }
       return answersMap;
   }
+
+  /*public void replaceSolutionOnFeedbackWithNumbers(LinkedHashMap<String, String> answerList, ItemDataIfc item, List<List<String>> texts) {
+	  List<String> textFeedback;
+	  String correctFeedback = item.getCorrectItemFeedback();
+	  SString incorrectFeedback = item.getInCorrectItemFeedback();
+
+	  for (int i=0; i<texts.size(); i++) {
+		  List<String> parts = texts.get(i);
+		  for (int j=0; j<parts.size(); j++) {
+			  String map = answerList.get(parts.get(j));
+			  if (map != null) {
+				  String num = map.substring(0, map.indexOf("|"));
+				  parts.set(j, num);
+			  }
+		  }
+		  if (i == 1) {
+			  item.setCorrectItemFeedback(correctFeedback, parts.stream().collect(Collectors.joining("")));
+		  } else if (i == 2) {
+			  item.setInCorrectItemFeedback(incorrectFeedback, parts.stream().collect(Collectors.joining("")));
+		  }
+	  }
+  }*/
 
   /**
    * extractCalculations() is a utility function for Calculated Questions.  It takes
@@ -2930,6 +2960,24 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
       return segments;
   }
 
+  protected List<String> extractFeedbackSegments(String feedback) {
+      List<String> segments = new ArrayList<>();
+      String[] results = null;
+
+      if (!StringUtils.isEmpty(feedback)) {
+          String[] firstResults = CALCQ_DOUBLE_OPEN_BRACKET.split(feedback); // only works because all variables and calculations are already replaced
+          for (String r: firstResults) {
+              results = (CALCQ_DOUBLE_CLOSE_BRACKET.split(r));
+              segments.addAll(Arrays.asList(results));
+          }
+          if (segments.size() == 1) {
+              // add in the trailing segment
+              segments.add("");
+          }
+      }
+      return segments;
+  }
+
   
   /**
    * CALCULATED_QUESTION
@@ -3019,8 +3067,8 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
    * Samigo expression parser, which should never happen as this is validated
    * when the question is saved, or if a divide by zero error occurs.
    */
-  private Map<Integer, String> calculateFormulaValues(Map<String, String> variables, ItemDataIfc item) throws Exception {
-      Map<Integer, String> values = new HashMap<>();
+  private Map<String, String> calculateFormulaValues(Map<String, String> variables, ItemDataIfc item) throws Exception {
+	  LinkedHashMap<String, String> values = new LinkedHashMap<>();
       String instructions = item.getInstruction();
       List<String> formulaNames = this.extractFormulas(instructions);
       for (int i = 0; i < formulaNames.size(); i++) {
@@ -3034,7 +3082,7 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
           
           String substitutedFormula = replaceMappedVariablesWithNumbers(formula,variables);
           String formulaValue = processFormulaIntoValue(substitutedFormula, decimalPlaces);
-          values.put(i + 1, formulaValue + answerData); // later answerData will be used for scoring
+          values.put(formulaName, formulaValue + answerData); // later answerData will be used for scoring
       }
       return values;
   }
@@ -3054,10 +3102,13 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
    * @param answerList is cleared and filled with sequential answers to the question
    * @return ArrayList of the pieces of text to display surrounding input boxes
    */
-  public List<String> extractCalcQAnswersArray(Map<Integer, String> answerList, ItemDataIfc item, Long gradingId, String agentId) {
+  public List<List<String>> extractCalcQAnswersArray(LinkedHashMap<String, String> answerList, ItemDataIfc item, Long gradingId, String agentId) {
       boolean hasErrors = true;
       Map<String, String> variableRangeMap = buildVariableRangeMap(item);
       List<String> instructionSegments = new ArrayList<>(0);
+      List<String> correctFeedbackSegments = new ArrayList<>(0);
+      List<String> incorrectFeedbackSegments = new ArrayList<>(0);
+
       answerList.clear();
 
       int attemptCount = 1;
@@ -3065,7 +3116,7 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
           instructionSegments.clear();
           Map<String, String> variablesWithValues = determineRandomValuesForRanges(variableRangeMap,item.getItemId(), gradingId, agentId, attemptCount);
           try {
-              Map<Integer, String> evaluatedFormulas = calculateFormulaValues(variablesWithValues, item);
+              Map<String, String> evaluatedFormulas = calculateFormulaValues(variablesWithValues, item);
               answerList.putAll(evaluatedFormulas);
               // replace the variables in the text with values
               String instructions = item.getInstruction();
@@ -3082,6 +3133,8 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
                   // if could not process the calculation into a result then throws IllegalStateException which will be caught below and cause the numbers to regenerate
                   // only pull out the segments if the formulas worked
                   instructionSegments = extractInstructionSegments(instructions);
+                  correctFeedbackSegments = extractFeedbackSegments(correctFeedbackValue);
+                  incorrectFeedbackSegments = extractFeedbackSegments(incorrectFeedbackValue);
                   item.setCorrectItemFeedback(correctFeedback, correctFeedbackValue);
                   item.setInCorrectItemFeedback(incorrectFeedback, incorrectFeedbackValue);
                   hasErrors = false;
@@ -3094,7 +3147,7 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
               attemptCount++;
           }
       }
-      return instructionSegments;
+      return List.of(instructionSegments, correctFeedbackSegments, incorrectFeedbackSegments);
   }
   
   /**

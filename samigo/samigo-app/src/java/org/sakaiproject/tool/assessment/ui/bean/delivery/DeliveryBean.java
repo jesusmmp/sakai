@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -485,9 +486,9 @@ public class DeliveryBean implements Serializable {
   @Setter
   private Map publishedItemHash = new HashMap();
   @Setter
-  private Map publishedItemTextHash = new HashMap();
+  private LinkedHashMap publishedItemTextHash = new LinkedHashMap();
   @Setter
-  private Map publishedAnswerHash = new HashMap();
+  private LinkedHashMap publishedAnswerHash = new LinkedHashMap();
   @Getter @Setter
   private List attachmentList;
 
@@ -1918,7 +1919,7 @@ public class DeliveryBean implements Serializable {
     return this.publishedItemHash;
   }
 
-  public Map getPublishedItemTextHash(){
+  public LinkedHashMap getPublishedItemTextHash(){
     if (this.publishedItemTextHash.isEmpty()){
       PublishedAssessmentService pubService = new PublishedAssessmentService();
       this.publishedItemTextHash = pubService.preparePublishedItemTextHash(getPublishedAssessment());
@@ -1926,7 +1927,7 @@ public class DeliveryBean implements Serializable {
     return this.publishedItemTextHash;
   }
 
-  public Map getPublishedAnswerHash(){
+  public LinkedHashMap getPublishedAnswerHash(){
     if (this.publishedAnswerHash.isEmpty()){
       PublishedAssessmentService pubService = new PublishedAssessmentService();
       this.publishedAnswerHash = pubService.preparePublishedAnswerHash(getPublishedAssessment());

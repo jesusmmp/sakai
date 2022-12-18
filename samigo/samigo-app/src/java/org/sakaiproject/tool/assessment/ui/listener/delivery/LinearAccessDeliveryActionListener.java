@@ -22,6 +22,7 @@
 package org.sakaiproject.tool.assessment.ui.listener.delivery;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -256,7 +257,7 @@ public class LinearAccessDeliveryActionListener extends DeliveryActionListener
       log.debug("after partIndex = " + delivery.getPartIndex());
       log.debug("after questionIndex = " + delivery.getQuestionIndex());
 
-      Map publishedAnswerHash = pubService.preparePublishedAnswerHash(publishedAssessment);
+      LinkedHashMap publishedAnswerHash = pubService.preparePublishedAnswerHash(publishedAssessment);
 
       if(itemGradingHash != null) {
           delivery.setTableOfContents(getContents(publishedAssessment, itemGradingHash,delivery, publishedAnswerHash));

@@ -31,11 +31,13 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
@@ -530,7 +532,7 @@ public class DeliveryActionListener
       overloadItemData(delivery, itemGradingHash, publishedAssessment);
 
       // get table of contents
-      Map<Long, AnswerIfc> publishedAnswerHash = pubService.preparePublishedAnswerHash(publishedAssessment);
+      LinkedHashMap<Long, AnswerIfc> publishedAnswerHash = pubService.preparePublishedAnswerHash(publishedAssessment);
       delivery.setTableOfContents(getContents(publishedAssessment, itemGradingHash, delivery, publishedAnswerHash));
       // get current page contents
       log.debug("**** resetPageContents="+this.resetPageContents);
@@ -2347,13 +2349,17 @@ public class DeliveryActionListener
       String agentId = determineCalcQAgentId(delivery, bean);
 
       service.getAnswersMap().clear();
-      List<String> texts = service.extractCalcQAnswersArray(service.getAnswersMap(), item, gradingId, agentId);
-      if (texts.isEmpty())
+      List<List<String>> texts = service.extractCalcQAnswersArray(service.getAnswersMap(), item, gradingId, agentId);
+      if (texts.get(0).isEmpty())
       {
           log.error("Unable to extract any question text from calculated question with item id {}. The formula for this question may be invalid.", item.getItemId());
-          texts = Collections.singletonList(rb.get("calc.extract_text_error").toString());
+          //texts.get(0) = Collections.singletonList(rb.get("calc.extract_text_error").toString());
       }
-      service.setTexts(texts);
+      service.setTexts(texts.get(0));
+
+      //changing solutions ex: {{w}} with numbers
+      replaceSolutionOnFeedbackWithNumbers(service.getAnswersMap(), item, texts);
+
       String questionText = service.getTexts().get(0);
 
       ItemTextIfc text = (ItemTextIfc) item.getItemTextArraySorted().toArray()[0];
@@ -2369,11 +2375,11 @@ public class DeliveryActionListener
       // answers too.
       // I sort this list by answer id so that it will come back from the student in a 
       // predictable order.
-      Collections.sort(calcQuestionEntities, new Comparator<AnswerIfc>(){
+      /*Collections.sort(calcQuestionEntities, new Comparator<AnswerIfc>(){
           public int compare(AnswerIfc a1, AnswerIfc a2) {
               return a1.getId().compareTo(a2.getId());
           }
-      });
+      });*/
 
       Iterator<AnswerIfc> iter = calcQuestionEntities.iterator();
       while (iter.hasNext())
@@ -2406,7 +2412,7 @@ public class DeliveryActionListener
                       {
                           answer.setText("");
                       }
-                      fbean.setIsCorrect(service.getCalcQResult(data, item, service.getAnswersMap(), i));
+                      fbean.setIsCorrect(service.getCalcQResult(data, item, service.getAnswersMap(), answer.getLabel()));
                   }
               }
           }
@@ -2900,7 +2906,7 @@ public class DeliveryActionListener
   
   /**
    * CALCULATED_QUESTION
-   * This returns the comma and space delimted answer key for display such as "42.1, 23.19"
+   * This returns the comma and space delimited answer key for display such as "42.1, 23.19"
    */
   private String commaDelimitedCalcQuestionAnswers(ItemDataIfc item, DeliveryBean delivery, ItemContentsBean itemBean) {
 	  long gradingId = determineCalcQGradingId(delivery);
@@ -2909,12 +2915,11 @@ public class DeliveryActionListener
 	  String keysString = "";
 
 	service.getAnswersMap().clear();
-	service.setTexts(service.extractCalcQAnswersArray(service.getAnswersMap(), item, gradingId, agentId));
+	List<List<String>> texts = service.extractCalcQAnswersArray(service.getAnswersMap(), item, gradingId, agentId);
+	service.setTexts(texts.get(0));
 
-	int answerSequence = 1; // this corresponds to the sequence value assigned in extractCalcQAnswersArray()
 	int decimalPlaces = 3;
-	while(answerSequence <= service.getAnswersMap().size()) {
-		  String answer = (String)service.getAnswersMap().get(answerSequence);
+	for (String answer : service.getAnswersMap().values()) {
 		  decimalPlaces = Integer.valueOf(answer.substring(answer.indexOf(',')+1, answer.length()));
 		  answer = answer.substring(0, answer.indexOf("|")); // cut off extra data e.g. "|2,3"
 		  
@@ -2922,14 +2927,38 @@ public class DeliveryActionListener
 		  answer = service.toScientificNotation(answer, decimalPlaces);
 		  
 		  keysString = keysString.concat(answer + ", ");
-		  answerSequence++;
-	  }
+	}
 	  if (keysString.length() > 2) {
 		  keysString = keysString.substring(0, keysString.length()-2); // truncating the comma and blank on the end
 	  }
+
+	  //changing solutions ex: {{w}} with numbers
+	  replaceSolutionOnFeedbackWithNumbers(service.getAnswersMap(), item, texts);
+
 	  return keysString;
   }
   
+  public void replaceSolutionOnFeedbackWithNumbers(LinkedHashMap<String, String> answerList, ItemDataIfc item, List<List<String>> texts) {
+	  String correctFeedback = item.getCorrectItemFeedback();
+	  String incorrectFeedback = item.getInCorrectItemFeedback();
+
+	  for (int i=0; i<texts.size(); i++) {
+		  List<String> parts = texts.get(i);
+		  for (int j=0; j<parts.size(); j++) {
+			  String map = answerList.get(parts.get(j));
+			  if (map != null) {
+				  String num = map.substring(0, map.indexOf("|"));
+				  parts.set(j, num);
+			  }
+		  }
+		  if (i == 1) {
+			  item.setCorrectItemFeedback(correctFeedback, parts.stream().collect(Collectors.joining("")));
+		  } else if (i == 2) {
+			  item.setInCorrectItemFeedback(incorrectFeedback, parts.stream().collect(Collectors.joining("")));
+		  }
+	  }
+  }
+
   /**
    * CALCULATED_QUESTION
    * We need the agentIds in order to properly set the pseudorandom seed

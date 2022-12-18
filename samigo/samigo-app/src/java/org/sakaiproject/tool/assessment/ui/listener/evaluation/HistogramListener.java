@@ -834,8 +834,8 @@ public class HistogramListener
     
     //build a hashMap (publishedItemId, publishedItem)
     Map publishedItemHash = pubService.preparePublishedItemHash(pub);
-    Map publishedItemTextHash = pubService.preparePublishedItemTextHash(pub);
-    Map publishedAnswerHash = pubService.preparePublishedAnswerHash(pub);
+    LinkedHashMap publishedItemTextHash = pubService.preparePublishedItemTextHash(pub);
+    LinkedHashMap publishedAnswerHash = pubService.preparePublishedAnswerHash(pub);
     
  // re-attach session and load all lazy loaded parent/child stuff
        
@@ -1703,7 +1703,7 @@ public class HistogramListener
 		results.put(CORRECT, Integer.valueOf(0));
 		results.put(INCORRECT, Integer.valueOf(0));
 
-		Map<Integer, String> answersMap = new HashMap<>();
+		LinkedHashMap<String, String> answersMap = new LinkedHashMap<>();
 		int total = 0;
 		int i = 1;
 		Long publishAnswerIdAnt = scores.get(0).getPublishedAnswerId();
@@ -1716,7 +1716,7 @@ public class HistogramListener
 			delegate.extractCalcQAnswersArray(answersMap, item, score.getAssessmentGradingId(), score.getAgentId());
 			if (score.getAutoScore() != null) {
 				total++;
-				if (delegate.getCalcQResult(score, item, answersMap, i)) {
+				if (delegate.getCalcQResult(score, item, answersMap, (answersMap.keySet().toArray())[ i - 1 ].toString())) {
 					results.merge(CORRECT, 1, Integer::sum);
 				} else {
 					results.merge(INCORRECT, 1, Integer::sum);

@@ -20,6 +20,7 @@ package org.sakaiproject.tool.assessment.services.assessment;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -403,8 +404,8 @@ public class PublishedAssessmentService extends AssessmentService{
       getItemType(new Long(publishedItemId));
   }
 
-  public Map<Long, ItemTextIfc> preparePublishedItemTextHash(PublishedAssessmentIfc publishedAssessment){
-    HashMap<Long, ItemTextIfc> map = new HashMap<>();
+  public LinkedHashMap<Long, ItemTextIfc> preparePublishedItemTextHash(PublishedAssessmentIfc publishedAssessment){
+    LinkedHashMap<Long, ItemTextIfc> map = new LinkedHashMap<>();
     List<SectionDataIfc> sectionArray = publishedAssessment.getSectionArray();
     for (int i=0;i<sectionArray.size(); i++){
       SectionDataIfc section = sectionArray.get(i);
@@ -435,8 +436,8 @@ public class PublishedAssessmentService extends AssessmentService{
     return map;
   }
 
-  public Map<Long, AnswerIfc> preparePublishedAnswerHash(PublishedAssessmentIfc publishedAssessment){
-    Map<Long, AnswerIfc> map = new HashMap<>();
+  public LinkedHashMap<Long, AnswerIfc> preparePublishedAnswerHash(PublishedAssessmentIfc publishedAssessment){
+    LinkedHashMap<Long, AnswerIfc> map = new LinkedHashMap<>();
     ArrayList<SectionDataIfc> sectionArray = publishedAssessment.getSectionArray();
     for (int i=0;i<sectionArray.size(); i++){
      SectionDataIfc section = sectionArray.get(i);
@@ -501,9 +502,9 @@ public class PublishedAssessmentService extends AssessmentService{
    * @param publishedAssessment
    * @return the map of item id -> item for calc questions in this map
    */
-  public Map<Long, ItemDataIfc> prepareCalcQuestionItemHash(PublishedAssessmentIfc publishedAssessment){
+  public LinkedHashMap<Long, ItemDataIfc> prepareCalcQuestionItemHash(PublishedAssessmentIfc publishedAssessment){
       // CALCULATED_QUESTION
-      Map<Long, ItemDataIfc> map = new HashMap<>();
+	  LinkedHashMap<Long, ItemDataIfc> map = new LinkedHashMap<>();
       List<SectionDataIfc> sectionArray = publishedAssessment.getSectionArray();
       for (int i=0;i<sectionArray.size(); i++) {
           SectionDataIfc section = sectionArray.get(i);
