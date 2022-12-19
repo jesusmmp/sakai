@@ -532,7 +532,7 @@ public class DeliveryActionListener
       overloadItemData(delivery, itemGradingHash, publishedAssessment);
 
       // get table of contents
-      LinkedHashMap<Long, AnswerIfc> publishedAnswerHash = pubService.preparePublishedAnswerHash(publishedAssessment);
+      Map<Long, AnswerIfc> publishedAnswerHash = pubService.preparePublishedAnswerHash(publishedAssessment);
       delivery.setTableOfContents(getContents(publishedAssessment, itemGradingHash, delivery, publishedAnswerHash));
       // get current page contents
       log.debug("**** resetPageContents="+this.resetPageContents);
@@ -2349,7 +2349,7 @@ public class DeliveryActionListener
       String agentId = determineCalcQAgentId(delivery, bean);
 
       service.getAnswersMap().clear();
-      List<List<String>> texts = service.extractCalcQAnswersArray(service.getAnswersMap(), item, gradingId, agentId);
+      List<List<String>> texts = service.extractCalcQAnswersArray(service.getAnswersMap(), service.getAnswersMapValues(), item, gradingId, agentId);
       if (texts.get(0).isEmpty())
       {
           log.error("Unable to extract any question text from calculated question with item id {}. The formula for this question may be invalid.", item.getItemId());
@@ -2358,7 +2358,7 @@ public class DeliveryActionListener
       service.setTexts(texts.get(0));
 
       //changing solutions ex: {{w}} with numbers
-      replaceSolutionOnFeedbackWithNumbers(service.getAnswersMap(), item, texts);
+      replaceSolutionOnFeedbackWithNumbers(service.getAnswersMapValues(), item, texts);
 
       String questionText = service.getTexts().get(0);
 
@@ -2375,11 +2375,11 @@ public class DeliveryActionListener
       // answers too.
       // I sort this list by answer id so that it will come back from the student in a 
       // predictable order.
-      /*Collections.sort(calcQuestionEntities, new Comparator<AnswerIfc>(){
+      Collections.sort(calcQuestionEntities, new Comparator<AnswerIfc>(){
           public int compare(AnswerIfc a1, AnswerIfc a2) {
               return a1.getId().compareTo(a2.getId());
           }
-      });*/
+      });
 
       Iterator<AnswerIfc> iter = calcQuestionEntities.iterator();
       while (iter.hasNext())
@@ -2412,7 +2412,7 @@ public class DeliveryActionListener
                       {
                           answer.setText("");
                       }
-                      fbean.setIsCorrect(service.getCalcQResult(data, item, service.getAnswersMap(), answer.getLabel()));
+                      fbean.setIsCorrect(service.getCalcQResult(data, item, service.getAnswersMap(), i));
                   }
               }
           }
@@ -2915,11 +2915,14 @@ public class DeliveryActionListener
 	  String keysString = "";
 
 	service.getAnswersMap().clear();
-	List<List<String>> texts = service.extractCalcQAnswersArray(service.getAnswersMap(), item, gradingId, agentId);
+	service.getAnswersMapValues().clear();
+	List<List<String>> texts = service.extractCalcQAnswersArray(service.getAnswersMap(), service.getAnswersMapValues(), item, gradingId, agentId);
 	service.setTexts(texts.get(0));
 
+	int answerSequence = 1; // this corresponds to the sequence value assigned in extractCalcQAnswersArray()
 	int decimalPlaces = 3;
-	for (String answer : service.getAnswersMap().values()) {
+	while(answerSequence <= service.getAnswersMap().size()) {
+		  String answer = (String)service.getAnswersMap().get(answerSequence);
 		  decimalPlaces = Integer.valueOf(answer.substring(answer.indexOf(',')+1, answer.length()));
 		  answer = answer.substring(0, answer.indexOf("|")); // cut off extra data e.g. "|2,3"
 		  
@@ -2927,25 +2930,26 @@ public class DeliveryActionListener
 		  answer = service.toScientificNotation(answer, decimalPlaces);
 		  
 		  keysString = keysString.concat(answer + ", ");
+		  answerSequence++;
 	}
 	  if (keysString.length() > 2) {
 		  keysString = keysString.substring(0, keysString.length()-2); // truncating the comma and blank on the end
 	  }
 
 	  //changing solutions ex: {{w}} with numbers
-	  replaceSolutionOnFeedbackWithNumbers(service.getAnswersMap(), item, texts);
+	  replaceSolutionOnFeedbackWithNumbers(service.getAnswersMapValues(), item, texts);
 
 	  return keysString;
   }
   
-  public void replaceSolutionOnFeedbackWithNumbers(LinkedHashMap<String, String> answerList, ItemDataIfc item, List<List<String>> texts) {
+  public void replaceSolutionOnFeedbackWithNumbers(LinkedHashMap<String, String> answerListValues, ItemDataIfc item, List<List<String>> texts) {
 	  String correctFeedback = item.getCorrectItemFeedback();
 	  String incorrectFeedback = item.getInCorrectItemFeedback();
 
 	  for (int i=0; i<texts.size(); i++) {
 		  List<String> parts = texts.get(i);
 		  for (int j=0; j<parts.size(); j++) {
-			  String map = answerList.get(parts.get(j));
+			  String map = answerListValues.get(parts.get(j));
 			  if (map != null) {
 				  String num = map.substring(0, map.indexOf("|"));
 				  parts.set(j, num);

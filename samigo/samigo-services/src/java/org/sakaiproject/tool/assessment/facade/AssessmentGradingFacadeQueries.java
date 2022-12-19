@@ -31,8 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -986,7 +984,6 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
 
                 Iterator<ItemGradingData> iter = itemGradingCollection.iterator();
                 while (iter.hasNext()) {
-                	
                     ItemGradingData itemGradingData = iter.next();
                     if (attachmentMap.get(itemGradingData.getItemGradingId()) != null) {
                         itemGradingData.setItemGradingAttachmentSet(attachmentMap.get(itemGradingData.getItemGradingId()));
@@ -1962,9 +1959,9 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
 
         Set publishedAssessmentSections = pubService.getSectionSetForAssessment(Long.valueOf(publishedAssessmentId));
         Double zeroDouble = 0.0;
-        LinkedHashMap publishedAnswerHash = pubService.preparePublishedAnswerHash(pubService.getPublishedAssessment(
+        Map publishedAnswerHash = pubService.preparePublishedAnswerHash(pubService.getPublishedAssessment(
                 publishedAssessmentId));
-        LinkedHashMap publishedItemTextHash = pubService.preparePublishedItemTextHash(pubService.getPublishedAssessment(
+        Map publishedItemTextHash = pubService.preparePublishedItemTextHash(pubService.getPublishedAssessment(
                 publishedAssessmentId));
         Map publishedItemHash = pubService.preparePublishedItemHash(pubService.getPublishedAssessment(
                 publishedAssessmentId));

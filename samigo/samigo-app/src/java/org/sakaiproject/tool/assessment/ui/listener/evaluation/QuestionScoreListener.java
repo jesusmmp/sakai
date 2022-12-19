@@ -229,7 +229,7 @@ import org.sakaiproject.tool.assessment.data.ifc.shared.TypeIfc;
 			log.debug("questionScores(): publishedItemHash.size = "
 					+ publishedItemHash.size());
 			// build a hashMap (publishedItemTextId, publishedItemText)
-			LinkedHashMap<Long, ItemTextIfc> publishedItemTextHash = pubService.preparePublishedItemTextHash(publishedAssessment);
+			Map<Long, ItemTextIfc> publishedItemTextHash = pubService.preparePublishedItemTextHash(publishedAssessment);
 			log.debug("questionScores(): publishedItemTextHash.size = "
 					+ publishedItemTextHash.size());
 			GradingService delegate = new GradingService();
@@ -255,7 +255,7 @@ import org.sakaiproject.tool.assessment.data.ifc.shared.TypeIfc;
 				log.debug("item = {}:{}-{}", thisItemTextIfc.getSequence(), thisItemTextIfc.getText(), thisItemTextIfc.getItem().getItemId());
 
 			}
-			LinkedHashMap publishedAnswerHash = pubService
+			Map publishedAnswerHash = pubService
 					.preparePublishedAnswerHash(publishedAssessment);
 			// re-attach session and load all lazy loaded parent/child stuff
 
@@ -560,7 +560,7 @@ import org.sakaiproject.tool.assessment.data.ifc.shared.TypeIfc;
 				results.setItemGradingArrayList(answerList);
 				// The list is sorted by item id so that it will come back from the student in a 
 				// predictable order. This is also required by the getCalcQResult method.
-				/*if (TypeIfc.CALCULATED_QUESTION.equals(Long.parseLong(bean.getTypeId()))) { // CALCULATED_QUESTION
+				if (TypeIfc.CALCULATED_QUESTION.equals(Long.parseLong(bean.getTypeId()))) { // CALCULATED_QUESTION
 					// list is sorted by answer id for calculated question
 					Collections.sort(answerList, new Comparator<ItemGradingData>() {
 						public int compare(ItemGradingData i1, ItemGradingData i2) {
@@ -574,9 +574,9 @@ import org.sakaiproject.tool.assessment.data.ifc.shared.TypeIfc;
 							return NumberUtils.compare(i1.getPublishedAnswerId(),i2.getPublishedAnswerId());
 						}
 					   }
-					});*/
+					});
 
-				if (!TypeIfc.CALCULATED_QUESTION.equals(Long.parseLong(bean.getTypeId()))) { // Non calculated question
+				} else { // Non calculated question
 					// The list is sorted by item id so that it will come back from the student in a 
 					// predictable order. This is also required by the getCalcQResult method. 
 					Collections.sort(answerList, new Comparator<ItemGradingData>() {
@@ -596,11 +596,12 @@ import org.sakaiproject.tool.assessment.data.ifc.shared.TypeIfc;
 				Iterator iter2 = answerList.iterator();
 				List<ItemGradingAttachment> itemGradingAttachmentList = new ArrayList<>();
 				int i = 1;
-				LinkedHashMap<String, String> answersMap = new LinkedHashMap<String, String>();
+				Map<Integer, String> answersMap = new HashMap<Integer, String>();
+				LinkedHashMap<String, String> answersMapValues = new LinkedHashMap<String, String>();
 				while (iter2.hasNext()) {
 					ItemGradingData gdata = (ItemGradingData) iter2.next();
 					results.setItemGrading(gdata);
-					delegate.extractCalcQAnswersArray(answersMap, item, 
+					delegate.extractCalcQAnswersArray(answersMap, answersMapValues, item, 
 								gdata.getAssessmentGradingId(), gdata.getAgentId());
 					itemGradingAttachmentList.addAll(gdata.getItemGradingAttachmentSet());
 					agentResultsByItemGradingIdMap.put(gdata.getItemGradingId(), results);
@@ -794,15 +795,14 @@ import org.sakaiproject.tool.assessment.data.ifc.shared.TypeIfc;
 						}
 						else if (bean.getTypeId().equals("15")) {  // CALCULATED_QUESTION
 							// Answers Keys
-							String label = (answersMap.keySet().toArray())[ i++ - 1 ].toString();
-							answerKey = (String)answersMap.get(label);
+							answerKey = (String)answersMap.get(i);
 							decimalPlaces = Integer.valueOf(answerKey.substring(answerKey.indexOf(',')+1, answerKey.length()));
 							answerKey = answerKey.substring(0, answerKey.indexOf("|")); // cut off extra data e.g. "|2,3"
 							// We need the key formatted in scientificNotation
 							answerKey = delegate.toScientificNotation(answerKey, decimalPlaces);
 
 							// Answers
-							if (delegate.getCalcQResult(gdata, item, answersMap, label)) {
+							if (delegate.getCalcQResult(gdata, item, answersMap, i++)) {
 								answerText = checkmarkGif + answerText;
 							} else {
 								answerText = crossmarkGif + answerText;

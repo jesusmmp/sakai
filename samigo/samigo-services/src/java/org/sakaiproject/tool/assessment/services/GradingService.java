@@ -157,7 +157,9 @@ public class GradingService
   @Getter @Setter
   private List<String> texts;
   @Getter @Setter
-  private LinkedHashMap<String, String> answersMap = new LinkedHashMap<String, String>();
+  private HashMap<Integer, String> answersMap = new HashMap<Integer, String>();
+  @Getter @Setter
+  private LinkedHashMap<String, String> answersMapValues = new LinkedHashMap<String, String>();
   private static final int MAX_ERROR_TRIES = 100;
 	  
   /**
@@ -716,7 +718,7 @@ public class GradingService
   public void saveOrUpdateAssessmentGradingOnly(AssessmentGradingData assessment)
   {
 	  Set origItemGradingSet = assessment.getItemGradingSet();
-	  LinkedHashSet h = new LinkedHashSet(origItemGradingSet);
+	  HashSet h = new HashSet (origItemGradingSet);
 	  
 	  // Clear the itemGradingSet so no data gets inserted/updated in SAM_ITEMGRADING_T;
 	  origItemGradingSet.clear();
@@ -902,7 +904,7 @@ public class GradingService
       List<ItemGradingData> tempItemGradinglist = new ArrayList<>(itemGradingSet);
       
       // CALCULATED_QUESTION - if this is a calc question. Carefully sort the list of answers
-      /*if (isCalcQuestion(tempItemGradinglist, publishedItemHash)) {
+      if (isCalcQuestion(tempItemGradinglist, publishedItemHash)) {
 	      Collections.sort(tempItemGradinglist, new Comparator<ItemGradingData>(){
 	    	  public int compare(ItemGradingData o1, ItemGradingData o2) {
 	    		  ItemGradingData gradeData1 = o1;
@@ -916,7 +918,7 @@ public class GradingService
 	    		  return gradeData1.getPublishedAnswerId().compareTo(gradeData2.getPublishedAnswerId());
 	    	  }
 	      });
-      }*/
+      }
       
     //IMAGEMAP_QUESTION - order by itemGradingId if it is an imageMap question
       if (isImageMapQuestion(tempItemGradinglist, publishedItemHash)) {
@@ -1283,7 +1285,7 @@ public class GradingService
     // Because if itemGradingSet is not saved to DB, we cannot go to DB to get it. We have to 
     // get it through data.
     if (persistToDB) {
-        data.setItemGradingSet(new LinkedHashSet());
+        data.setItemGradingSet(new HashSet());
     	saveOrUpdateAssessmentGrading(data);
     	log.debug("****x7. {}", (new Date()).getTime());	
     	if (!regrade) {
@@ -1473,10 +1475,10 @@ public class GradingService
       case 11: // FIN
     	  try {
     	      if (type == 15) {  // CALCULATED_QUESTION
-	              Map<String, String> calculatedAnswersMap = getCalculatedAnswersMap(itemGrading, item, calcQuestionAnswerSequence);
+	              Map<Integer, String> calculatedAnswersMap = getCalculatedAnswersMap(itemGrading, item, calcQuestionAnswerSequence);
 	              int numAnswers = calculatedAnswersMap.size();
 
-	              autoScore = getCalcQScore(itemGrading, item, calculatedAnswersMap, (calculatedAnswersMap.keySet().toArray())[ calcQuestionAnswerSequence - 1 ].toString() ) / (double) numAnswers;
+	              autoScore = getCalcQScore(itemGrading, item, calculatedAnswersMap, calcQuestionAnswerSequence ) / (double) numAnswers;
 	          } else {
 	              autoScore = getFINScore(itemGrading, item, publishedAnswerHash) / (double) ((ItemTextIfc) item.getItemTextSet().toArray()[0]).getAnswerSet().size();
 	          }
@@ -2276,17 +2278,17 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
    * @param calcQuestionAnswerSequence the order of answers in the list
    * @return score for the item.
    */
-  public double getCalcQScore(ItemGradingData data,  ItemDataIfc itemdata, Map<String, String> calculatedAnswersMap, String label)
+  public double getCalcQScore(ItemGradingData data,  ItemDataIfc itemdata, Map<Integer, String> calculatedAnswersMap, int calcQuestionAnswerSequence)
   {
 	  double totalScore = (double) 0;
 	  
 	  if (data.getAnswerText() == null) return totalScore; // zero for blank
 	  
-	  if (!calculatedAnswersMap.containsKey(label)) {
+	  if (!calculatedAnswersMap.containsKey(calcQuestionAnswerSequence)) {
 		  return totalScore;
 	  }
 	  // this variable should look something like this "42.1|2,2"
-	  String allAnswerText = calculatedAnswersMap.get(label);
+	  String allAnswerText = calculatedAnswersMap.get(calcQuestionAnswerSequence);
 	  
 	  // NOTE: this correctAnswer will already have been trimmed to the appropriate number of decimals
 	  BigDecimal correctAnswer = new BigDecimal(getAnswerExpression(allAnswerText));
@@ -2320,17 +2322,17 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
 	  
   }
 
-  public boolean getCalcQResult(ItemGradingData data,  ItemDataIfc itemdata, Map<String, String> calculatedAnswersMap, String label)
+  public boolean getCalcQResult(ItemGradingData data,  ItemDataIfc itemdata, Map<Integer, String> calculatedAnswersMap, int calcQuestionAnswerSequence)
   {
 	  boolean result = false;
 
 	  if (data.getAnswerText() == null) return result;
 
-	  if (!calculatedAnswersMap.containsKey(label)) {
+	  if (!calculatedAnswersMap.containsKey(calcQuestionAnswerSequence)) {
 		  return result;
 	  }
 	  // this variable should look something like this "42.1|2,2"
-	  String allAnswerText = calculatedAnswersMap.get(label);
+	  String allAnswerText = calculatedAnswersMap.get(calcQuestionAnswerSequence);
 
 	  // NOTE: this correctAnswer will already have been trimmed to the appropriate number of decimals
 	  BigDecimal correctAnswer = new BigDecimal(getAnswerExpression(allAnswerText));
@@ -2781,10 +2783,10 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
    * @param item
    * @return map of calc answers
    */
-  private LinkedHashMap<String, String> getCalculatedAnswersMap(ItemGradingData itemGrading, ItemDataIfc item, int calcQuestionAnswerSequence ) {
+  private Map<Integer, String> getCalculatedAnswersMap(ItemGradingData itemGrading, ItemDataIfc item, int calcQuestionAnswerSequence ) {
       // return value from extractCalcQAnswersArray is not used, calculatedAnswersMap is populated by this call
       if (calcQuestionAnswerSequence == 1) {
-          List<List<String>> texts = extractCalcQAnswersArray(answersMap, item, itemGrading.getAssessmentGradingId(), itemGrading.getAgentId());
+          List<List<String>> texts = extractCalcQAnswersArray(answersMap, answersMapValues, item, itemGrading.getAssessmentGradingId(), itemGrading.getAgentId());
 
           //changing solutions ex: {{w}} with numbers
           //replaceSolutionOnFeedbackWithNumbers(answersMap, item, texts);
@@ -3067,8 +3069,10 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
    * Samigo expression parser, which should never happen as this is validated
    * when the question is saved, or if a divide by zero error occurs.
    */
-  private Map<String, String> calculateFormulaValues(Map<String, String> variables, ItemDataIfc item) throws Exception {
-	  LinkedHashMap<String, String> values = new LinkedHashMap<>();
+  private ArrayList<Map> calculateFormulaValues(Map<String, String> variables, ItemDataIfc item) throws Exception {
+      Map<Integer, String> values = new LinkedHashMap<>();
+      LinkedHashMap<String, String> solutionVariables = new LinkedHashMap<>();
+      ArrayList<Map> maps = new ArrayList<Map>();
       String instructions = item.getInstruction();
       List<String> formulaNames = this.extractFormulas(instructions);
       for (int i = 0; i < formulaNames.size(); i++) {
@@ -3082,9 +3086,12 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
           
           String substitutedFormula = replaceMappedVariablesWithNumbers(formula,variables);
           String formulaValue = processFormulaIntoValue(substitutedFormula, decimalPlaces);
-          values.put(formulaName, formulaValue + answerData); // later answerData will be used for scoring
+          values.put(i + 1, formulaValue + answerData); // later answerData will be used for scoring
+          solutionVariables.put(formulaName, formulaValue + answerData); // later answerData will be used for scoring
       }
-      return values;
+      maps.add(values);
+      maps.add(solutionVariables);
+      return maps;
   }
 
   /**
@@ -3102,7 +3109,7 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
    * @param answerList is cleared and filled with sequential answers to the question
    * @return ArrayList of the pieces of text to display surrounding input boxes
    */
-  public List<List<String>> extractCalcQAnswersArray(LinkedHashMap<String, String> answerList, ItemDataIfc item, Long gradingId, String agentId) {
+  public List<List<String>> extractCalcQAnswersArray(Map<Integer, String> answerList, Map<String, String> answerListValues, ItemDataIfc item, Long gradingId, String agentId) {
       boolean hasErrors = true;
       Map<String, String> variableRangeMap = buildVariableRangeMap(item);
       List<String> instructionSegments = new ArrayList<>(0);
@@ -3116,8 +3123,9 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
           instructionSegments.clear();
           Map<String, String> variablesWithValues = determineRandomValuesForRanges(variableRangeMap,item.getItemId(), gradingId, agentId, attemptCount);
           try {
-              Map<String, String> evaluatedFormulas = calculateFormulaValues(variablesWithValues, item);
-              answerList.putAll(evaluatedFormulas);
+              ArrayList<Map> evaluatedFormulas = calculateFormulaValues(variablesWithValues, item);
+              answerList.putAll(evaluatedFormulas.get(0));
+              answerListValues.putAll(evaluatedFormulas.get(1));
               // replace the variables in the text with values
               String instructions = item.getInstruction();
               String correctFeedback = item.getCorrectItemFeedback();

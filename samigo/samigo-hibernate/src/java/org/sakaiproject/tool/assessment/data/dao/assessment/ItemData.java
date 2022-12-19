@@ -488,7 +488,7 @@ public ItemData() {}
    */
   public void setGeneralItemFeedback(String text, String value) {
     removeFeedbackByType(ItemFeedback.GENERAL_FEEDBACK);
-    addItemFeedback(ItemFeedback.GENERAL_FEEDBACK, text, "");
+    addItemFeedback(ItemFeedback.GENERAL_FEEDBACK, text, value);
   }
 
   public String getItemFeedback(String typeId) {

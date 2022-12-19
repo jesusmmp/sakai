@@ -23,7 +23,6 @@ package org.sakaiproject.tool.assessment.ui.listener.delivery;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
@@ -58,8 +57,8 @@ public class ResetDeliveryListener implements ActionListener
     if (!("takeAssessmentViaUrl").equals(bean.getActionString()))
       bean.setPublishedAssessment(null);
     bean.setPublishedItemHash(new HashMap());
-    bean.setPublishedItemTextHash(new LinkedHashMap());
-    bean.setPublishedAnswerHash(new LinkedHashMap());
+    bean.setPublishedItemTextHash(new HashMap());
+    bean.setPublishedAnswerHash(new HashMap());
     // reset timer before begin
     bean.setTimeElapse("0");
     bean.setTimeElapseAfterFileUpload(null);

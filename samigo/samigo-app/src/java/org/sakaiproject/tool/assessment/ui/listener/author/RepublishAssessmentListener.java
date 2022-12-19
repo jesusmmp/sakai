@@ -18,7 +18,6 @@ package org.sakaiproject.tool.assessment.ui.listener.author;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -169,8 +168,8 @@ public class RepublishAssessmentListener implements ActionListener {
 	
 	private void regradeRepublishedAssessment (PublishedAssessmentService pubService, PublishedAssessmentFacade publishedAssessment) {
 		Map publishedItemHash = pubService.preparePublishedItemHash(publishedAssessment);
-		LinkedHashMap publishedItemTextHash = pubService.preparePublishedItemTextHash(publishedAssessment);
-		LinkedHashMap publishedAnswerHash = pubService.preparePublishedAnswerHash(publishedAssessment);
+		Map publishedItemTextHash = pubService.preparePublishedItemTextHash(publishedAssessment);
+		Map publishedAnswerHash = pubService.preparePublishedAnswerHash(publishedAssessment);
 		PublishedAssessmentSettingsBean publishedAssessmentSettings = (PublishedAssessmentSettingsBean) ContextUtil
 			.lookupBean("publishedSettings");
 		// Actually we don't really need to consider linear or random here.
