@@ -59,6 +59,7 @@ import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.assessment.api.SamigoApiFactory;
 import org.sakaiproject.tool.assessment.data.dao.assessment.AssessmentAccessControl;
 import org.sakaiproject.tool.assessment.data.dao.assessment.EventLogData;
+import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedItemFeedback;
 import org.sakaiproject.tool.assessment.data.dao.grading.AssessmentGradingData;
 import org.sakaiproject.tool.assessment.data.dao.grading.ItemGradingAttachment;
 import org.sakaiproject.tool.assessment.data.dao.grading.ItemGradingData;
@@ -2956,9 +2957,9 @@ public class DeliveryActionListener
 			  }
 		  }
 		  if (i == 1) {
-			  item.setCorrectItemFeedback(correctFeedback, parts.stream().collect(Collectors.joining("")));
+			  item.updateFeedbackByType(PublishedItemFeedback.CORRECT_FEEDBACK, correctFeedback, parts.stream().collect(Collectors.joining("")));
 		  } else if (i == 2) {
-			  item.setInCorrectItemFeedback(incorrectFeedback, parts.stream().collect(Collectors.joining("")));
+			  item.updateFeedbackByType(PublishedItemFeedback.INCORRECT_FEEDBACK, incorrectFeedback, parts.stream().collect(Collectors.joining("")));
 		  }
 	  }
   }

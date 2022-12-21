@@ -42,6 +42,7 @@ import org.sakaiproject.tool.assessment.data.dao.assessment.ItemFeedback;
 import org.sakaiproject.tool.assessment.data.dao.assessment.ItemMetaData;
 import org.sakaiproject.tool.assessment.data.dao.assessment.ItemTag;
 import org.sakaiproject.tool.assessment.data.dao.assessment.ItemText;
+import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedItemFeedback;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.ItemTagIfc;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.ItemTextIfc;
 import org.sakaiproject.tool.assessment.data.ifc.assessment.ItemDataIfc;
@@ -989,6 +990,23 @@ public class ItemFacade implements Serializable, ItemDataIfc, Comparable<ItemDat
     }
   }
 
+  /**
+   * Update Feedback by feedback typeId (e.g. CORRECT, INCORRECT)
+   * @param feedbackTypeId
+   * @param text
+   * @param value
+   */
+  public void updateFeedbackByType(String feedbackTypeId, String text, String value) {
+    if (itemFeedbackSet != null) {
+      for (Iterator i = this.itemFeedbackSet.iterator(); i.hasNext(); ) {
+        PublishedItemFeedback itemFeedback = (PublishedItemFeedback) i.next();
+        if (itemFeedback.getTypeId().equals(feedbackTypeId)) {
+            itemFeedback.setText(text);
+            itemFeedback.setTextValue(value);
+        }
+      }
+    }
+  }
 
   /**
    * If this is a true-false question return true if it is true, else false.

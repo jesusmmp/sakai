@@ -64,6 +64,7 @@ import org.sakaiproject.samigo.util.SamigoConstants;
 import org.sakaiproject.spring.SpringBeanLocator;
 import org.sakaiproject.tool.assessment.data.dao.assessment.EventLogData;
 import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedItemData;
+import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedItemFeedback;
 import org.sakaiproject.tool.assessment.data.dao.grading.AssessmentGradingAttachment;
 import org.sakaiproject.tool.assessment.data.dao.grading.AssessmentGradingData;
 import org.sakaiproject.tool.assessment.data.dao.grading.ItemGradingAttachment;
@@ -3143,8 +3144,8 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
                   instructionSegments = extractInstructionSegments(instructions);
                   correctFeedbackSegments = extractFeedbackSegments(correctFeedbackValue);
                   incorrectFeedbackSegments = extractFeedbackSegments(incorrectFeedbackValue);
-                  item.setCorrectItemFeedback(correctFeedback, correctFeedbackValue);
-                  item.setInCorrectItemFeedback(incorrectFeedback, incorrectFeedbackValue);
+                  item.updateFeedbackByType(PublishedItemFeedback.CORRECT_FEEDBACK, correctFeedback, correctFeedbackValue);
+                  item.updateFeedbackByType(PublishedItemFeedback.INCORRECT_FEEDBACK, incorrectFeedback, incorrectFeedbackValue);
                   hasErrors = false;
               } catch (SamigoExpressionError e1) {
                   log.warn("Samigo calculated item ({}) calculation invalid: {}", item.getItemId(), e1.get());
