@@ -943,7 +943,7 @@ public class ItemFacade implements Serializable, ItemDataIfc, Comparable<ItemDat
   }
 
   /**
-   * Get feedback based on feedback type (e.g. CORRECT, INCORRECT)
+   * Get feedback value based on feedback type (e.g. CORRECT, INCORRECT)
    * @param feedbackTypeId
    * @return
    */

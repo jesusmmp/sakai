@@ -2786,35 +2786,10 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
   private Map<Integer, String> getCalculatedAnswersMap(ItemGradingData itemGrading, ItemDataIfc item, int calcQuestionAnswerSequence ) {
       // return value from extractCalcQAnswersArray is not used, calculatedAnswersMap is populated by this call
       if (calcQuestionAnswerSequence == 1) {
-          List<List<String>> texts = extractCalcQAnswersArray(answersMap, answersMapValues, item, itemGrading.getAssessmentGradingId(), itemGrading.getAgentId());
-
-          //changing solutions ex: {{w}} with numbers
-          //replaceSolutionOnFeedbackWithNumbers(answersMap, item, texts);
+          extractCalcQAnswersArray(answersMap, answersMapValues, item, itemGrading.getAssessmentGradingId(), itemGrading.getAgentId());
       }
       return answersMap;
   }
-
-  /*public void replaceSolutionOnFeedbackWithNumbers(LinkedHashMap<String, String> answerList, ItemDataIfc item, List<List<String>> texts) {
-	  List<String> textFeedback;
-	  String correctFeedback = item.getCorrectItemFeedback();
-	  SString incorrectFeedback = item.getInCorrectItemFeedback();
-
-	  for (int i=0; i<texts.size(); i++) {
-		  List<String> parts = texts.get(i);
-		  for (int j=0; j<parts.size(); j++) {
-			  String map = answerList.get(parts.get(j));
-			  if (map != null) {
-				  String num = map.substring(0, map.indexOf("|"));
-				  parts.set(j, num);
-			  }
-		  }
-		  if (i == 1) {
-			  item.setCorrectItemFeedback(correctFeedback, parts.stream().collect(Collectors.joining("")));
-		  } else if (i == 2) {
-			  item.setInCorrectItemFeedback(incorrectFeedback, parts.stream().collect(Collectors.joining("")));
-		  }
-	  }
-  }*/
 
   /**
    * extractCalculations() is a utility function for Calculated Questions.  It takes

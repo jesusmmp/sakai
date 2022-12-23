@@ -2354,7 +2354,7 @@ public class DeliveryActionListener
       if (texts.get(0).isEmpty())
       {
           log.error("Unable to extract any question text from calculated question with item id {}. The formula for this question may be invalid.", item.getItemId());
-          //texts.get(0) = Collections.singletonList(rb.get("calc.extract_text_error").toString());
+          texts.set(0, Collections.singletonList(rb.get("calc.extract_text_error").toString()));
       }
       service.setTexts(texts.get(0));
 
