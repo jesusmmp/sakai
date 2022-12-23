@@ -503,7 +503,7 @@ public class PublishedAssessmentService extends AssessmentService{
    */
   public Map<Long, ItemDataIfc> prepareCalcQuestionItemHash(PublishedAssessmentIfc publishedAssessment){
       // CALCULATED_QUESTION
-	  Map<Long, ItemDataIfc> map = new HashMap<>();
+      Map<Long, ItemDataIfc> map = new HashMap<>();
       List<SectionDataIfc> sectionArray = publishedAssessment.getSectionArray();
       for (int i=0;i<sectionArray.size(); i++) {
           SectionDataIfc section = sectionArray.get(i);

@@ -719,7 +719,7 @@ public class GradingService
   public void saveOrUpdateAssessmentGradingOnly(AssessmentGradingData assessment)
   {
 	  Set origItemGradingSet = assessment.getItemGradingSet();
-	  HashSet h = new HashSet (origItemGradingSet);
+	  HashSet h = new HashSet(origItemGradingSet);
 	  
 	  // Clear the itemGradingSet so no data gets inserted/updated in SAM_ITEMGRADING_T;
 	  origItemGradingSet.clear();
@@ -1478,7 +1478,6 @@ public class GradingService
     	      if (type == 15) {  // CALCULATED_QUESTION
 	              Map<Integer, String> calculatedAnswersMap = getCalculatedAnswersMap(itemGrading, item, calcQuestionAnswerSequence);
 	              int numAnswers = calculatedAnswersMap.size();
-
 	              autoScore = getCalcQScore(itemGrading, item, calculatedAnswersMap, calcQuestionAnswerSequence ) / (double) numAnswers;
 	          } else {
 	              autoScore = getFINScore(itemGrading, item, publishedAnswerHash) / (double) ((ItemTextIfc) item.getItemTextSet().toArray()[0]).getAnswerSet().size();

@@ -2947,7 +2947,7 @@ public class DeliveryActionListener
 	  String correctFeedback = item.getCorrectItemFeedback();
 	  String incorrectFeedback = item.getInCorrectItemFeedback();
 
-	  for (int i=0; i<texts.size(); i++) {
+	  for (int i=1; i<texts.size(); i++) {
 		  List<String> parts = texts.get(i);
 		  for (int j=0; j<parts.size(); j++) {
 			  String map = answerListValues.get(parts.get(j));

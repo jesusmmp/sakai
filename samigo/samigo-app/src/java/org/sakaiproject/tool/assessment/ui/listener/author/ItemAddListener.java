@@ -2951,24 +2951,24 @@ public class ItemAddListener implements ActionListener {
 		  item.addItemFeedback(feedbackTypeId, feedbackText, feedbackTextValue);
 	  }
 	  else {
-          boolean feedbackTypeExists = false;
+		  boolean feedbackTypeExists = false;
 		  Iterator iter = itemFeedbackSet.iterator();
 		  while (iter.hasNext()) {
 			  ItemFeedbackIfc itemFeedback = (ItemFeedbackIfc) iter.next();
 			  if (itemFeedback.getTypeId().equals(feedbackTypeId)) {
-                  feedbackTypeExists = true;
+				  feedbackTypeExists = true;
 				  itemFeedback.setText(feedbackText);
 				  itemFeedback.setTextValue(feedbackTextValue);
 				  break;
 			  }
 		  }
-          //If the feedback type was not found in the set, add it so changes are not lost.
-          if (!feedbackTypeExists) {
-        	  item.addItemFeedback(feedbackTypeId, feedbackText, feedbackTextValue);
-          }
+		  //If the feedback type was not found in the set, add it so changes are not lost.
+		  if (!feedbackTypeExists) {
+			  item.addItemFeedback(feedbackTypeId, feedbackText, feedbackTextValue);
+		  }
 	  }
   }
-  
+
   private String [] getSurveyChoices(String scalename) {
 	  String[] choices = new String[2];
 	  // label is null because we don't use labels in survey
