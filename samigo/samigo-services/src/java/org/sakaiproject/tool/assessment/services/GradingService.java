@@ -2952,7 +2952,11 @@ Here are the definition and 12 cases I came up with (lydia, 01/2006):
 	    && bdx.doubleValue() != 0) {
 		  formatter = new DecimalFormat(FORMAT_MASK);
 	  } else {
-		  formatter = new DecimalFormat("0");
+		  if ((String.valueOf(bdx.doubleValue()).contains("e")) || (String.valueOf(bdx.doubleValue()).contains("E"))) {
+			  formatter = new DecimalFormat(FORMAT_MASK);
+		  } else {
+			  formatter = new DecimalFormat("0");
+		  }
 	  }	  
 	  
 	  formatter.setRoundingMode(RoundingMode.HALF_UP);	  
